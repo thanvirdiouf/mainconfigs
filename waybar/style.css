@@ -1,3 +1,10 @@
+/*
+  Style for Waybar (top bar, three islands)
+  Based on the template you provided, extended for the custom modules in the config.
+  - `otf-font-awesome` or a Nerd Font is required for icons
+  Save as: $HOME/.config/waybar/style.css
+*/
+
 * {
     /* `otf-font-awesome` is required to be installed for icons */
     font-family: AgaveNerdFont, Roboto, Helvetica, Arial, sans-serif;
@@ -49,7 +56,8 @@ button:hover {
 }
 
 /* you can set a style on hover for any module like this */
-#pulseaudio:hover {
+#pulseaudio:hover,
+#pulseaudio.custom:hover {
     background-color: #a37800;
 }
 
@@ -93,7 +101,11 @@ button:hover {
 #idle_inhibitor,
 #scratchpad,
 #power-profiles-daemon,
-#mpd {
+#mpd,
+#custom-network,
+#custom-cpu,
+#custom-memory,
+#custom-power {
     padding: 0 10px;
     color: #ffffff;
 }
@@ -325,3 +337,52 @@ label:focus {
 #privacy-item.audio-out {
     background-color: #0069d4;
 }
+
+/* --- Custom module additions for your config --- */
+
+/* pulseaudio: already handled above; make hover helpful */
+#pulseaudio:hover {}
+
+/* custom network module (we used "custom/network" -> module id becomes custom-network) */
+#custom-network {
+    background-color: #2980b9;
+}
+#custom-network:hover {}
+#custom-network.toggled { /* when showing speeds */
+    background-color: #1f6aa8;
+}
+#custom-network.disconnected {
+    background-color: #f53c3c;
+}
+
+/* custom cpu module */
+#custom-cpu {
+    background-color: #2ecc71;
+    color: #000000;
+}
+#custom-cpu:hover {}
+#custom-cpu.overheated { background-color: #eb4d4b; }
+
+/* custom memory module */
+#custom-memory {
+    background-color: #9b59b6;
+}
+#custom-memory.toggled { /* absolute mode */
+    background-color: #7a3f9a;
+}
+#custom-memory:hover {}
+
+/* custom power module (power button) */
+#custom-power {
+    background-color: transparent;
+    padding: 0 6px;
+}
+#custom-power:hover { background-color: rgba(255,255,255,0.06);}
+
+/* battery: adjust icon spacing */
+#battery .icon { margin-right: 6px; }
+
+/* small-screen compact mode utility */
+
+
+/* End of style.css */

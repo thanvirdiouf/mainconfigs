@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+# ~/.config/waybar/scripts/network_toggle.sh
+# Usage:
+#   network_toggle.sh           -> prints JSON with "text" and "tooltip"
+#   network_toggle.sh toggle    -> toggles display mode (ssid <-> speed)
+
+STATEFILE=/tmp/waybar_net_mode   # 0 = show SSID, 1 = show speeds
+
+toggle_state() {
+  [ -f "$STATEFILE" ] || echo 0 >"$STATEFILE"
+  cur=$(cat "$STATEFILE")
+  if [ "$cur" = "0" ]; then echo 1 >"$STATEFILE"; else echo 0 >"$STATEFILE"; fi
+  # tell waybar to refresh (SIGRTMIN+1)
+  pkill -RTMIN+1 waybar 2>/dev/null || true
+}
+
+get_iface() {
+  ip route get 1.1.1.1 2>/dev/null | awk '/dev/ {for(i=1;i<=NF;i++){ if($i=="dev"){print $(i+1); exit}}}'
+}
+
+get_ssid() {
+  # try nmcli, then iwgetid
+  ssid=$(nmcli -t -f ACTIVE,SSID dev wifi 2>/dev/null | awk -F: '$1=="yes"{print $2; exit}')
+  if [ -z "$ssid" ]; then ssid=$(iwgetid -r 2>/dev/null); fi
+  [ -z "$ssid" ] && ssid="offline"
+  echo "$ssid"
+}
+
+get_ip() {
+  iface=$(get_iface)
+  [ -z "$iface" ] && echo "no iface" && return
+  ip -4 -o addr show dev "$iface" | awk '{print $4}' | cut -d/ -f1 | head -n1
+}
+
+# compute net speeds using /proc/net/dev deltas (simple)
+get_speeds() {
+  iface=$(get_iface)
+  [ -z "$iface" ] && echo "0B/s 0B/s" && return
+  # read counters
+  read -r rx1 tx1 < <(awk -v i="$iface" '$1 ~ i":" {print $2, $10}' /proc/net/dev)
+  sleep 1
+  read -r rx2 tx2 < <(awk -v i="$iface" '$1 ~ i":" {print $2, $10}' /proc/net/dev)
+  drx=$((rx2 - rx1))
+  dtx=$((tx2 - tx1))
+  human() {
+    b=$1
+    if [ $b -ge 1048576 ]; then awk -v b="$b" 'BEGIN{printf("%.1fMB/s", b/1048576)}'
+    elif [ $b -ge 1024 ]; then awk -v b="$b" 'BEGIN{printf("%.1fKB/s", b/1024)}'
+    else printf("%dB/s" "$b")
+    fi
+  }
+  echo "$(human $dtx) ↑ / $(human $drx) ↓"
+}
+
+case "$1" in
+  toggle)
+    toggle_state
+    exit 0
+    ;;
+  *)
+    [ -f "$STATEFILE" ] || echo 0 >"$STATEFILE"
+    mode=$(cat "$STATEFILE")
+    ssid=$(get_ssid)
+    ipaddr=$(get_ip)
+    if [ "$mode" = "0" ]; then
+      # show SSID as main text; tooltip is IP
+      jq -n --arg t "📶 $ssid" --arg tooltip "IP: $ipaddr" '{text:$t, tooltip:$tooltip}'
+    else
+      speeds=$(get_speeds)
+      jq -n --arg t "📶 $speeds" --arg tooltip "IP: $ipaddr" '{text:$t, tooltip:$tooltip}'
+    fi
+    ;;
+esac
+
