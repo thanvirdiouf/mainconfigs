@@ -1,106 +1,137 @@
-// -*- mode: jsonc -*-
 {
-    // Put waybar on top
+    // General Waybar settings
     "layer": "top",
     "position": "top",
-    "height": 30,
-    "spacing": 6,
+    "height": 42,
+    "spacing": 5,
 
-    // --- Layout: three islands
+    // Module arrangement
     "modules-left": [
         "hyprland/workspaces",
         "hyprland/window"
     ],
-
     "modules-center": [
         "clock"
     ],
-
     "modules-right": [
         "pulseaudio",
-        "custom/network",
-        "custom/cpu",
-        "custom/memory",
+        "network",
+        "cpu",
+        "temperature",
+        "custom/gpu-temp",
+        "memory",
         "battery",
         "custom/power"
     ],
 
-    // --- Module configs
-
+    // Module Configurations
+    // ---------------------- Left Island ----------------------
     "hyprland/workspaces": {
-        "disable-scroll": true,
-        "all-outputs": true,
-        "warp-on-scroll": false,
-        "format": "{name} {icon}",
+        "format": "{icon}",
         "format-icons": {
-            "1": "",
-            "2": "",
-            "3": "",
-            "4": "",
-            "5": "",
-            "urgent": "",
-            "focused": "",
-            "default": ""
+            "1": "󰎦",
+            "2": "󰎩",
+            "3": "󰎬",
+            "4": "󰎮",
+            "5": "󰎰",
+            "urgent": "󱨇",
+            "default": "󰎡"
         },
-        "on-scroll-up": "hyprctl dispatch workspace e+1",
-        "on-scroll-down": "hyprctl dispatch workspace e-1"
+        "on-click": "activate",
+        "persistent-workspaces": {
+            "1": [],
+            "2": [],
+            "3": [],
+            "4": [],
+            "5": []
+        }
     },
-
     "hyprland/window": {
-        "format": "{title}",
-        "separate-outputs": true
+        "format": " {}",
+        "max-length": 35
     },
 
+    // ---------------------- Center Island ----------------------
     "clock": {
-        "format": "{:%a %d %b %H:%M}",
-        "tooltip-format": "<big>{:%A, %d %B %Y}</big>\n<tt><small>{calendar}</small></tt>"
+        "format": "{:%I:%M %p }",
+        "format-alt": "{:%A, %B %d, %Y 󰸗}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt>{calendar}</tt>"
     },
 
-    // --- PulseAudio volume: scroll to change volume, click to open pavucontrol
+    // ---------------------- Right Island ----------------------
     "pulseaudio": {
-        "format": "{volume}% ",
-        "format-bluetooth": "{volume}% ",
-        "format-muted": " {format_source}",
-        "format-source": "{volume}% ",
+        "format": "{icon} {volume}%",
+        "format-muted": "󰸈 Muted",
         "format-icons": {
+            "headphone": "󰋋",
+            "hands-free": "󰋎",
+            "headset": "󰋎",
+"phone": "󰏲",
+            "portable": "󰏲",
+            "car": "󰄋",
             "default": ["", "", ""]
         },
-        "scroll-step": 5,
         "on-click": "pavucontrol",
         "on-scroll-up": "pactl set-sink-volume @DEFAULT_SINK@ +5%",
-        "on-scroll-down": "pactl set-sink-volume @DEFAULT_SINK@ -5%"
+        "on-scroll-down": "pactl set-sink-volume @DEFAULT_SINK@ -5%",
+        "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
+    },
+    
+    "network": {
+        "format": "{ifname}",
+        "format-wifi": "{essid} ",
+        "format-ethernet": "󰈀 Connected",
+        "format-disconnected": "󰖪 Disconnected",
+        "tooltip-format": "IP: {ipaddr}\nGateway: {gwaddr}",
+        "tooltip-format-wifi": "{essid} ({signalStrength}%) \nIP: {ipaddr}\nGateway: {gwaddr}",
+        "on-click": "nm-connection-editor", // Or your preferred network manager
+        "format-alt": " {bandwidthUpBytes}  {bandwidthDownBytes}",
+        "on-click-right": "kitty -e nmtui" // Example: open nmtui in kitty on right click
     },
 
-    "custom/cpu": {
-    "exec": "~/.config/waybar/scripts/cpu.sh",
-    "interval": 2,
-    "return-type": "json"
-},
-"custom/memory": {
-    "exec": "~/.config/waybar/scripts/memory.sh",
-    "interval": 5,
-    "return-type": "json"
-},
-"custom/network": {
-    "exec": "~/.config/waybar/scripts/network.sh",
-    "interval": 5,
-    "return-type": "json"
-},
+    "cpu": {
+        "format": "󰍛 {usage}%",
+        "tooltip": true,
+        "thermal-zone": 7, // ⬅️ Change the number to 7
+        "exec-tooltip": "~/.config/waybar/scripts/cpu-tooltip.sh"
+    }, 
 
-    // --- Battery: shows remaining battery with icon; scroll adjusts brightness
+    "temperature": {
+        "thermal-zone": 7,
+        "critical-threshold": 82, // takes unit: Celcius
+        "format": "{temperatureC}°C ", // optionally, temperatureC
+        "interval": 1, // seconds between module updates
+    },
+    "custom/gpu-temp": {
+        "exec": "~/.config/waybar/scripts/gpu-temp.sh",
+        "format": "󰢢 {}",
+        "interval": 5, // Update every 5 seconds
+        "tooltip": false
+    },
+    "memory": {
+        "format": "󰾆 {}%",
+        "format-alt": "󰾆 {used}G/{total}G",
+        "interval": 5
+    },
+
     "battery": {
-        "format": "{capacity}% {icon}",
-        "format-charging": "{capacity}% ",
-        "format-icons": ["", "", "", "", ""],
-        "states": { "warning": 30, "critical": 15 },
-        "on-scroll-up": "brightnessctl set +5%",
-        "on-scroll-down": "brightnessctl set 5%-"
+        "states": {
+            "good": 95,
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{icon} {capacity}%",
+        "format-charging": "󰂄 {capacity}%",
+        "format-plugged": "󰂄 {capacity}%",
+        "format-icons": ["󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+        "on-scroll-up": "brightnessctl set 5%+",
+        "on-scroll-down": "brightnessctl set 5%-",
+        "tooltip-format": "{timeTo}\n{power} W"
     },
 
-    // --- Power: click to show wlogout
     "custom/power": {
-        "format": "⏻",
-        "tooltip": "Open power menu",
-        "on-click": "wlogout"
+        "format": "",
+        "on-click": "wlogout",
+        "tooltip-text": "Power Menu"
     }
 }
