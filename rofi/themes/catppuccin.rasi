@@ -1,0 +1,114 @@
+/*
+ * Catppuccin Mocha Rofi Theme
+ * File: ~/.config/rofi/themes/catppuccin.rasi
+ */
+
+* {
+    /* Catppuccin Mocha Colors */
+    rosewater:  #f5e0dc;
+    flamingo:   #f2cdcd;
+    pink:       #f5c2e7;
+    mauve:      #cba6f7;
+    red:        #f38ba8;
+    maroon:     #eba0ac;
+    peach:      #fab387;
+    yellow:     #f9e2af;
+    green:      #a6e3a1;
+    teal:       #94e2d5;
+    sky:        #89dceb;
+    sapphire:   #74c7ec;
+    blue:       #89b4fa;
+    lavender:   #b4befe;
+
+    text:       #cdd6f4;
+    subtext1:   #bac2de;
+    subtext0:   #a6adc8;
+    overlay2:   #9399b2;
+    overlay1:   #7f849c;
+    overlay0:   #6c7086;
+
+    surface2:   #585b70;
+    surface1:   #45475a;
+    surface0:   #313244;
+
+    base:       #1e1e2e;
+    mantle:     #181825;
+    crust:      #11111b;
+
+    /* Theme-specific variables */
+    background-color:   @base;
+    text-color:         @text;
+    highlight-color:    @mauve;
+    border-color:       @surface0;
+    
+    font: "Iosevka Nerd Font 14";
+    
+    /* Disabling some properties */
+    border: 0;
+    margin: 0;
+    padding: 0;
+    spacing: 0;
+}
+
+window {
+    width: 45%;
+    background-color: @background-color;
+    border: 2px;
+    border-color: @border-color;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+mainbox {
+    children: [ inputbar, listview ];
+}
+
+listview {
+    columns: 4;
+    lines: 3;
+    layout: vertical;
+    spacing: 15px;
+}
+
+element {
+    orientation: vertical;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+element-icon {
+    size: 64px; /* This makes the icon large */
+    horizontal-align: 0.5;
+}
+
+element-text {
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+    text-color: inherit;
+}
+
+element selected {
+    background-color: @surface0;
+    text-color: @highlight-color;
+}
+
+inputbar {
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background-color: @surface0;
+    children: [ prompt, entry ];
+}
+
+prompt {
+    text-color: @highlight-color;
+    background-color: inherit;
+    padding: 0 10px 0 0;
+}
+
+entry {
+    background-color: inherit;
+    text-color: @text-color;
+    placeholder: "Search...";
+    placeholder-color: @overlay0;
+}

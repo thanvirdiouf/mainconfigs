@@ -1,0 +1,20 @@
+/*
+ * Main Rofi configuration
+ * File: ~/.config/rofi/config.rasi
+ */
+
+configuration {
+    modi:               "drun,window";
+    show-icons:         true;
+    icon-theme:         "Papirus"; /* Or your preferred icon theme */
+    
+    /* Search settings */
+    matching:           "fuzzy";
+    case-sensitive:     false;
+
+    /* Layout settings from theme */
+    /* We don't need to specify layout here as it's handled by the theme */
+}
+
+/* Import the theme */
+@theme "themes/catppuccin.rasi"

@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# Directory: ~/.config/rofi/scripts/powermenu.sh
+# Make executable: chmod +x ~/.config/rofi/scripts/powermenu.sh
+
+# Catppuccin-Mocha colors
+background="#1e1e2e"
+foreground="#cdd6f4"
+selection="#313244"
+comment="#6c7086"
+red="#f38ba8"
+yellow="#f9e2af"
+green="#a6e3a1"
+blue="#89b4fa"
+
+# Options with Nerd Font icons
+shutdown="󰐥 Shutdown"
+reboot=" Reboot"
+lock="󰌾 Lock"
+suspend="󰤄 Suspend"
+logout="󰍃 Logout"
+
+# Get user choice
+chosen=$(echo -e "$shutdown\n$reboot\n$lock\n$suspend\n$logout" | rofi -dmenu \
+    -p "Power Menu" \
+    -theme-str "window {background-color: $background;}" \
+    -theme-str "element-text {color: $foreground;}" \
+    -theme-str "element selected {background-color: $selection;}" \
+    -theme-str "inputbar {background-color: $background; text-color: $foreground;}" \
+    -theme-str "prompt {background-color: $background; text-color: $blue;}"
+)
+
+# Execute command based on choice
+case "$chosen" in
+    "$shutdown")
+        systemctl poweroff
+        ;;
+    "$reboot")
+        systemctl reboot
+        ;;
+    "$lock")
+        # Use your preferred screen locker. swaylock is a common choice.
+        swaylock
+        ;;
+    "$suspend")
+        systemctl suspend
+        ;;
+    "$logout")
+        hyprctl dispatch exit 0
+        ;;
+esac
